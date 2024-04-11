@@ -107,7 +107,7 @@ def sheetcsv(gsuite, sheetfile, sheetname, cellrange):
 )
 @click.option("--notify/--no-notify", default=True, help="Send event notifications")
 @click.pass_obj
-def attendees(gsuite, calendar_name, event_ids, attfile, notify, attendees):
+def attendees(gsuite, calendar_name, event_ids, attfile, notify):
     """Set attendees for one or more events.
 
     Pass the name of the calendar as noted on calendar.google.com, and any number of event ids. You
@@ -125,7 +125,9 @@ def attendees(gsuite, calendar_name, event_ids, attfile, notify, attendees):
             calendar_id, event_id, attendees, notify=notify
         )
         attlen = len(event["attendees"]) if "attendees" in event else 0
-        click.echo(f"Updated event '{event['summary']}' with {attlen} attendees")
+        click.echo(
+            f"Updated event '{event.get('summary', '(no title)')}' with {attlen} attendees"
+        )
 
 
 @gsuite.command()
@@ -160,7 +162,9 @@ def list_events(gsuite, calendar_name, time_min, time_max, query):
         for event in events:
             start = event["start"].get("dateTime", event["start"].get("date"))
             end = event["end"].get("dateTime", event["end"].get("date"))
-            click.echo(f"{event['id']} - {event['summary']} ({start} to {end})")
+            click.echo(
+                f"{event['id']} - {event.get('summary', '(no title)')} ({start} to {end})"
+            )
 
 
 @main.group(help="Commands related to indico.")
