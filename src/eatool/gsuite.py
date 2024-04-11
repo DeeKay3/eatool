@@ -75,8 +75,8 @@ class GSuite:
             .list(
                 calendarId=calendar_id,
                 q=query,
-                timeMin=time_min,
-                timeMax=time_max,
+                timeMin=time_min.astimezone().isoformat(),
+                timeMax=time_max.astimezone().isoformat(),
                 singleEvents=True,
                 orderBy="startTime",
             )
