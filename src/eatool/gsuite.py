@@ -9,15 +9,22 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-# Not committing this file right now, it should ideally be part of a config.
-from .oauth import OAUTH_CREDS
-
 
 class GSuite:
     SCOPES = [
         "https://www.googleapis.com/auth/calendar",
         "https://www.googleapis.com/auth/spreadsheets",
     ]
+
+    OAUTH_CREDS = {
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "client_id": "675767516221-fphq122iepql9vg21ihl7nan08j9lem6.apps.googleusercontent.com",
+        "client_secret": None,
+        "project_id": "eatool-385421",
+        "redirect_uris": ["http://localhost"],
+        "token_uri": "https://oauth2.googleapis.com/token",
+    }
 
     @cached_property
     def calsvc(self):
@@ -29,8 +36,17 @@ class GSuite:
         creds = self.get_credentials()
         return build("sheets", "v4", credentials=creds)
 
-    def clear_credentials(self):
-        keyring.delete_password("eatool", "gsuite")
+    def clear_credentials(self, client_secret=False):
+        try:
+            keyring.delete_password("eatool", "gsuite")
+        except keyring.errors.PasswordDeleteError:
+            pass
+
+        if client_secret:
+            try:
+                keyring.delete_password("eatool", "gsuite-client-secret")
+            except keyring.errors.PasswordDeleteError:
+                pass
 
     def get_credentials(self):
         creds = None
@@ -43,8 +59,18 @@ class GSuite:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
+                oauth_secret = keyring.get_password("eatool", "gsuite-client-secret")
+                if not oauth_secret:
+                    oauth_secret = input(
+                        "Please enter OAuth Client Secret (check with Philipp): "
+                    )
+                    keyring.set_password("eatool", "gsuite-client-secret", oauth_secret)
+
+                oauth_creds = GSuite.OAUTH_CREDS.copy()
+                oauth_creds["client_secret"] = oauth_secret
+
                 flow = InstalledAppFlow.from_client_config(
-                    OAUTH_CREDS, scopes=GSuite.SCOPES
+                    {"installed": oauth_creds}, scopes=GSuite.SCOPES
                 )
                 creds = flow.run_local_server(port=0)
 

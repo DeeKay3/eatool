@@ -4,7 +4,6 @@ import re
 from functools import cached_property
 
 import click
-import keyring
 from indico_cli import cli as indico_cli
 
 from .gsuite import GSuite
@@ -48,22 +47,20 @@ def main(ctx, debug, env):
     ctx.obj = ContextObject(env, debug)
 
 
-@main.command()
-@click.pass_obj
-def cleartoken(ctxo):
-    """Clear GSuite tokens."""
-
-    try:
-        ctxo.gsuite.clear_credentials()
-        click.echo("Successfully cleared auth token")
-    except keyring.errors.PasswordDeleteError:
-        pass
-
-
 @main.group(help="Commands related to GSuite.")
 @click.pass_context
 def gsuite(ctx):
     ctx.obj = ctx.parent.obj.gsuite
+
+
+@gsuite.command()
+@click.option("--secret", is_flag=True, help="Also clear GSuite OAuth client secret")
+@click.pass_obj
+def cleartoken(ctxo, secret):
+    """Clear GSuite tokens."""
+
+    ctxo.clear_credentials(secret)
+    click.echo("GSuite token(s) have been cleared")
 
 
 @gsuite.command()
