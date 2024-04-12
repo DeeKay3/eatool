@@ -9,27 +9,51 @@ The `eatool indico` subcommand makes use of [indico-cli](https://github.com/kewi
 Installation
 ============
 
-First, here are the steps to get the package set up.
-
+First, here are the steps to get the package set up:
 ```bash
-# Install requirements (Linux only)
-apt install dbus-python
-
-# Install and forget. Run this again to upgrade.
 pip install git+https://github.com/kewisch/eatool.git
 
-# Alternatively, install from sources
+# If you get an error about "externally managed environment", run this instead:
+apt install pipx
+pipx install git+https://github.com/kewisch/eatool.git
+pipx ensurepath
+```
+
+If you'd like to be able to change the sources or debug something with code, you can do this instead:
+```bash
 git clone https://github.com/kewisch/eatool
 cd eatool
-pip install -e .[dev]
+pipx install -e .[dev]
 
-# Upgrade, if you've installed from sources
+# This is how you can upgrade to the latest version
 cd eatool
 git pull
 ```
 
-Afterwards, you should be able to run `eatool` from anywhere. On the first run you'll need to enter
-the OAuth client secret. Reach out to me internally to get it.
+If you are getting errors including `KeyringLocked: Failed to unlock the collection`, you might need
+to unlock your keyring. There may be more pretty ways to do this, but here is one way:
+
+```bash
+# Do this once. Paste everything including EOF into the command line
+cat <<EOF >> ~/.bashrc
+function unlock-keyring ()
+{
+    read -rsp "Password: " pass
+    export $(echo -n "$pass" | gnome-keyring-daemon --replace --unlock)
+    unset pass
+}
+EOF
+
+# Afterwards, run this once to load the function, or start a new terminal.
+source ~/.bashrc
+
+# Do this any time you need to unlock the keyring
+unlock-keyring
+```
+
+
+Now you should be able to run `eatool` from anywhere. On the first run you'll need to enter the
+OAuth client secret. Reach out to me internally to get it.
 
 Examples
 ========
