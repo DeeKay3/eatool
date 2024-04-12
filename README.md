@@ -18,7 +18,6 @@ apt install pipx
 pipx install git+https://github.com/kewisch/eatool.git
 pipx ensurepath
 
-
 # If want to upgrade, simply run the respective pip install or pipx install command again:
 pipx install git+https://github.com/kewisch/eatool.git
 ```
