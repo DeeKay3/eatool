@@ -2,6 +2,7 @@ import http.client
 import logging
 import re
 from functools import cached_property
+from urllib.parse import urlparse
 
 import click
 from indico_cli import cli as indico_cli
@@ -76,15 +77,20 @@ def sheetcsv(gsuite, sheetfile, sheetname, cellrange):
     """
 
     if sheetfile.startswith("http"):
-        match = re.search(
-            r"^https://docs.google.com/spreadsheets/d/([^/]*)/edit(?:#gid=(\d+))?",
-            sheetfile,
-        )
-        if not match:
+        url = urlparse(sheetfile)
+        if not url:
             raise click.BadParameter("Invalid Sheets URL")
-        sheetfile = match[1]
-        if not sheetname:
-            sheetname = match[2]
+
+        pathmatch = re.search(r"/spreadsheets/d/([^/]*)/", url.path)
+        fragmatch = re.search(r"gid=(\d+)", url.fragment)
+
+        if not pathmatch:
+            raise click.BadParameter("Invalid Sheets URL")
+
+        sheetfile = pathmatch[1]
+
+        if not sheetname and fragmatch:
+            sheetname = fragmatch[1]
 
     click.echo(
         gsuite.sheetcsv(sheetfile, sheetName=sheetname, cellRange=cellrange), nl=False
