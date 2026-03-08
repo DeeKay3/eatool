@@ -4,27 +4,27 @@ EA Tool
 A collection of purpose-built tools for the EA team. I enjoy automating things, but once this
 monster gets too big we'll need to see if another team can take this on :-)
 
-The `eatool indico` subcommand makes use of [indico-cli](https://github.com/kewisch/indico-cli).
+The `eatool indico` subcommand makes use of [indico-cli](https://github.com/DeeKay3/indico-cli).
 
 Installation
 ============
 
 First, here are the steps to get the package set up:
 ```bash
-pip install git+https://github.com/kewisch/eatool.git
+pip install git+https://github.com/DeeKay3/eatool.git
 
 # If you get an error about "externally managed environment", run this instead:
 apt install pipx
-pipx install git+https://github.com/kewisch/eatool.git
+pipx install git+https://github.com/DeeKay3/eatool.git
 pipx ensurepath
 
 # If want to upgrade, simply run the respective pip install or pipx install command again:
-pipx install git+https://github.com/kewisch/eatool.git
+pipx install git+https://github.com/DeeKay3/eatool.git
 ```
 
 If you'd like to be able to change the sources or debug something with code, you can do this instead:
 ```bash
-git clone https://github.com/kewisch/eatool
+git clone https://github.com/DeeKay3/eatool
 cd eatool
 pipx install -e .[dev]
 
